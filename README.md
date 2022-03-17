@@ -377,12 +377,12 @@ In the end, performance can not be the (only) criterion for choosing a router. P
 If you'd like to run these benchmarks locally, you'll need to install the package first:
 
 ```bash
-go get github.com/julienschmidt/go-http-routing-benchmark
+go get github.com/lvjp/go-http-routing-benchmark
 ```
 This may take a while due to the large number of dependencies that need to be downloaded. Once that command has finished you can run the full set of benchmarks like this:
 
 ```bash
-cd $GOPATH/src/github.com/julienschmidt/go-http-routing-benchmark
+cd $GOPATH/src/github.com/lvjp/go-http-routing-benchmark
 go test -bench=.
 ```
 

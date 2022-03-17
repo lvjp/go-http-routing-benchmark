@@ -16,7 +16,7 @@ import (
 	// If you add new routers please:
 	// - Keep the benchmark functions etc. alphabetically sorted
 	// - Make a pull request (without benchmark results) at
-	//   https://github.com/julienschmidt/go-http-routing-benchmark
+	//   https://github.com/lvjp/go-http-routing-benchmark
 	"github.com/ant0ine/go-json-rest/rest"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"

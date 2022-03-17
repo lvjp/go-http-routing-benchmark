@@ -1,4 +1,4 @@
-module github.com/julienschmidt/go-http-routing-benchmark
+module github.com/lvjp/go-http-routing-benchmark
 
 go 1.17
 
