@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/lvjp/go-http-routing-benchmark/router"
 )
 
 var benchRe *regexp.Regexp
@@ -81,7 +83,7 @@ func benchRequest(b *testing.B, router http.Handler, r *http.Request) {
 	}
 }
 
-func benchRoutes(b *testing.B, router http.Handler, routes []route) {
+func benchRoutes(b *testing.B, router http.Handler, routes []router.Route) {
 	w := new(mockResponseWriter)
 	r, _ := http.NewRequest("GET", "/", nil)
 	u := r.URL
@@ -92,9 +94,9 @@ func benchRoutes(b *testing.B, router http.Handler, routes []route) {
 
 	for i := 0; i < b.N; i++ {
 		for _, route := range routes {
-			r.Method = route.method
-			r.RequestURI = route.path
-			u.Path = route.path
+			r.Method = route.Method
+			r.RequestURI = route.Path
+			u.Path = route.Path
 			u.RawQuery = rq
 			router.ServeHTTP(w, r)
 		}

@@ -4,13 +4,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/lvjp/go-http-routing-benchmark/router"
 )
 
 var (
 	// load functions of all routers
 	routers = []struct {
 		name string
-		load func(routes []route) http.Handler
+		load func(routes []router.Route) http.Handler
 	}{
 		{"Ace", loadAce},
 		{"Aero", loadAero},
@@ -49,7 +51,7 @@ var (
 	// all APIs
 	apis = []struct {
 		name   string
-		routes []route
+		routes []router.Route
 	}{
 		{"GitHub", githubAPI},
 		{"GPlus", gplusAPI},
@@ -71,15 +73,15 @@ func TestRouters(t *testing.T) {
 
 			for _, route := range api.routes {
 				w := httptest.NewRecorder()
-				req.Method = route.method
-				req.RequestURI = route.path
-				u.Path = route.path
+				req.Method = route.Method
+				req.RequestURI = route.Path
+				u.Path = route.Path
 				u.RawQuery = rq
 				r.ServeHTTP(w, req)
-				if w.Code != 200 || w.Body.String() != route.path {
+				if w.Code != 200 || w.Body.String() != route.Path {
 					t.Errorf(
 						"%s in API %s: %d - %s; expected %s %s\n",
-						router.name, api.name, w.Code, w.Body.String(), route.method, route.path,
+						router.name, api.name, w.Code, w.Body.String(), route.Method, route.Path,
 					)
 				}
 			}

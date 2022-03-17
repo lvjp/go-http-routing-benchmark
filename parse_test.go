@@ -7,52 +7,54 @@ package main
 import (
 	"net/http"
 	"testing"
+
+	"github.com/lvjp/go-http-routing-benchmark/router"
 )
 
 // Parse
 // https://parse.com/docs/rest#summary
-var parseAPI = []route{
+var parseAPI = []router.Route{
 	// Objects
-	{"POST", "/1/classes/:className"},
-	{"GET", "/1/classes/:className/:objectId"},
-	{"PUT", "/1/classes/:className/:objectId"},
-	{"GET", "/1/classes/:className"},
-	{"DELETE", "/1/classes/:className/:objectId"},
+	{Method: "POST", Path: "/1/classes/:className"},
+	{Method: "GET", Path: "/1/classes/:className/:objectId"},
+	{Method: "PUT", Path: "/1/classes/:className/:objectId"},
+	{Method: "GET", Path: "/1/classes/:className"},
+	{Method: "DELETE", Path: "/1/classes/:className/:objectId"},
 
 	// Users
-	{"POST", "/1/users"},
-	{"GET", "/1/login"},
-	{"GET", "/1/users/:objectId"},
-	{"PUT", "/1/users/:objectId"},
-	{"GET", "/1/users"},
-	{"DELETE", "/1/users/:objectId"},
-	{"POST", "/1/requestPasswordReset"},
+	{Method: "POST", Path: "/1/users"},
+	{Method: "GET", Path: "/1/login"},
+	{Method: "GET", Path: "/1/users/:objectId"},
+	{Method: "PUT", Path: "/1/users/:objectId"},
+	{Method: "GET", Path: "/1/users"},
+	{Method: "DELETE", Path: "/1/users/:objectId"},
+	{Method: "POST", Path: "/1/requestPasswordReset"},
 
 	// Roles
-	{"POST", "/1/roles"},
-	{"GET", "/1/roles/:objectId"},
-	{"PUT", "/1/roles/:objectId"},
-	{"GET", "/1/roles"},
-	{"DELETE", "/1/roles/:objectId"},
+	{Method: "POST", Path: "/1/roles"},
+	{Method: "GET", Path: "/1/roles/:objectId"},
+	{Method: "PUT", Path: "/1/roles/:objectId"},
+	{Method: "GET", Path: "/1/roles"},
+	{Method: "DELETE", Path: "/1/roles/:objectId"},
 
 	// Files
-	{"POST", "/1/files/:fileName"},
+	{Method: "POST", Path: "/1/files/:fileName"},
 
 	// Analytics
-	{"POST", "/1/events/:eventName"},
+	{Method: "POST", Path: "/1/events/:eventName"},
 
 	// Push Notifications
-	{"POST", "/1/push"},
+	{Method: "POST", Path: "/1/push"},
 
 	// Installations
-	{"POST", "/1/installations"},
-	{"GET", "/1/installations/:objectId"},
-	{"PUT", "/1/installations/:objectId"},
-	{"GET", "/1/installations"},
-	{"DELETE", "/1/installations/:objectId"},
+	{Method: "POST", Path: "/1/installations"},
+	{Method: "GET", Path: "/1/installations/:objectId"},
+	{Method: "PUT", Path: "/1/installations/:objectId"},
+	{Method: "GET", Path: "/1/installations"},
+	{Method: "DELETE", Path: "/1/installations/:objectId"},
 
 	// Cloud Functions
-	{"POST", "/1/functions"},
+	{Method: "POST", Path: "/1/functions"},
 }
 
 var (

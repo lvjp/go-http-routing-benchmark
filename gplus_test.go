@@ -7,32 +7,34 @@ package main
 import (
 	"net/http"
 	"testing"
+
+	"github.com/lvjp/go-http-routing-benchmark/router"
 )
 
 // Google+
 // https://developers.google.com/+/api/latest/
 // (in reality this is just a subset of a much larger API)
-var gplusAPI = []route{
+var gplusAPI = []router.Route{
 	// People
-	{"GET", "/people/:userId"},
-	{"GET", "/people"},
-	{"GET", "/activities/:activityId/people/:collection"},
-	{"GET", "/people/:userId/people/:collection"},
-	{"GET", "/people/:userId/openIdConnect"},
+	{Method: "GET", Path: "/people/:userId"},
+	{Method: "GET", Path: "/people"},
+	{Method: "GET", Path: "/activities/:activityId/people/:collection"},
+	{Method: "GET", Path: "/people/:userId/people/:collection"},
+	{Method: "GET", Path: "/people/:userId/openIdConnect"},
 
 	// Activities
-	{"GET", "/people/:userId/activities/:collection"},
-	{"GET", "/activities/:activityId"},
-	{"GET", "/activities"},
+	{Method: "GET", Path: "/people/:userId/activities/:collection"},
+	{Method: "GET", Path: "/activities/:activityId"},
+	{Method: "GET", Path: "/activities"},
 
 	// Comments
-	{"GET", "/activities/:activityId/comments"},
-	{"GET", "/comments/:commentId"},
+	{Method: "GET", Path: "/activities/:activityId/comments"},
+	{Method: "GET", Path: "/comments/:commentId"},
 
 	// Moments
-	{"POST", "/people/:userId/moments/:collection"},
-	{"GET", "/people/:userId/moments/:collection"},
-	{"DELETE", "/moments/:id"},
+	{Method: "POST", Path: "/people/:userId/moments/:collection"},
+	{Method: "GET", Path: "/people/:userId/moments/:collection"},
+	{Method: "DELETE", Path: "/moments/:id"},
 }
 
 var (

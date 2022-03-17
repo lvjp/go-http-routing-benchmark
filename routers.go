@@ -22,6 +22,7 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/bmizerany/pat"
 	"github.com/go-playground/lars"
+	"github.com/lvjp/go-http-routing-benchmark/router"
 
 	cloudykitrouter "github.com/cloudykit/router"
 	"github.com/dimfeld/httptreemux"
@@ -59,11 +60,6 @@ import (
 	gojiv2pat "goji.io/pat"
 	"gopkg.in/macaron.v1"
 )
-
-type route struct {
-	method string
-	path   string
-}
 
 type mockResponseWriter struct{}
 
@@ -121,7 +117,7 @@ func aceHandleTest(c *ace.C) {
 	io.WriteString(c.Writer, c.Request.RequestURI)
 }
 
-func loadAce(routes []route) http.Handler {
+func loadAce(routes []router.Route) http.Handler {
 	h := []ace.HandlerFunc{aceHandle}
 	if loadTestHandler {
 		h = []ace.HandlerFunc{aceHandleTest}
@@ -129,7 +125,7 @@ func loadAce(routes []route) http.Handler {
 
 	router := ace.New()
 	for _, route := range routes {
-		router.Handle(route.method, route.path, h)
+		router.Handle(route.Method, route.Path, h)
 	}
 	return router
 }
@@ -153,26 +149,26 @@ func aeroHandlerTest(ctx aero.Context) error {
 	io.WriteString(ctx.Response().Internal(), ctx.Request().Path())
 	return nil
 }
-func loadAero(routes []route) http.Handler {
+func loadAero(routes []router.Route) http.Handler {
 	var h aero.Handler = aeroHandler
 	if loadTestHandler {
 		h = aeroHandlerTest
 	}
 	app := aero.New()
 	for _, r := range routes {
-		switch r.method {
+		switch r.Method {
 		case "GET":
-			app.Get(r.path, h)
+			app.Get(r.Path, h)
 		case "POST":
-			app.Post(r.path, h)
+			app.Post(r.Path, h)
 		case "PUT":
-			app.Put(r.path, h)
+			app.Put(r.Path, h)
 		case "PATCH":
-			app.Router().Add(http.MethodPatch, r.path, h)
+			app.Router().Add(http.MethodPatch, r.Path, h)
 		case "DELETE":
-			app.Delete(r.path, h)
+			app.Delete(r.Path, h)
 		default:
-			panic("Unknow HTTP method: " + r.method)
+			panic("Unknow HTTP method: " + r.Method)
 		}
 	}
 	return app
@@ -208,7 +204,7 @@ func bearHandlerTest(w http.ResponseWriter, r *http.Request, _ *bear.Context) {
 	io.WriteString(w, r.RequestURI)
 }
 
-func loadBear(routes []route) http.Handler {
+func loadBear(routes []router.Route) http.Handler {
 	h := bearHandler
 	if loadTestHandler {
 		h = bearHandlerTest
@@ -217,11 +213,11 @@ func loadBear(routes []route) http.Handler {
 	router := bear.New()
 	re := regexp.MustCompile(":([^/]*)")
 	for _, route := range routes {
-		switch route.method {
+		switch route.Method {
 		case "GET", "POST", "PUT", "PATCH", "DELETE":
-			router.On(route.method, re.ReplaceAllString(route.path, "{$1}"), h)
+			router.On(route.Method, re.ReplaceAllString(route.Path, "{$1}"), h)
 		default:
-			panic("Unknown HTTP method: " + route.method)
+			panic("Unknown HTTP method: " + route.Method)
 		}
 	}
 	return router
@@ -254,7 +250,7 @@ func initBeego() {
 	beego.BeeLogger.Close()
 }
 
-func loadBeego(routes []route) http.Handler {
+func loadBeego(routes []router.Route) http.Handler {
 	h := beegoHandler
 	if loadTestHandler {
 		h = beegoHandlerTest
@@ -263,20 +259,20 @@ func loadBeego(routes []route) http.Handler {
 	re := regexp.MustCompile(":([^/]*)")
 	app := beego.NewControllerRegister()
 	for _, route := range routes {
-		route.path = re.ReplaceAllString(route.path, ":$1")
-		switch route.method {
+		route.Path = re.ReplaceAllString(route.Path, ":$1")
+		switch route.Method {
 		case "GET":
-			app.Get(route.path, h)
+			app.Get(route.Path, h)
 		case "POST":
-			app.Post(route.path, h)
+			app.Post(route.Path, h)
 		case "PUT":
-			app.Put(route.path, h)
+			app.Put(route.Path, h)
 		case "PATCH":
-			app.Patch(route.path, h)
+			app.Patch(route.Path, h)
 		case "DELETE":
-			app.Delete(route.path, h)
+			app.Delete(route.Path, h)
 		default:
-			panic("Unknow HTTP method: " + route.method)
+			panic("Unknow HTTP method: " + route.Method)
 		}
 	}
 	return app
@@ -306,7 +302,7 @@ func boneHandlerWrite(rw http.ResponseWriter, req *http.Request) {
 	io.WriteString(rw, bone.GetValue(req, "name"))
 }
 
-func loadBone(routes []route) http.Handler {
+func loadBone(routes []router.Route) http.Handler {
 	h := http.HandlerFunc(httpHandlerFunc)
 	if loadTestHandler {
 		h = http.HandlerFunc(httpHandlerFuncTest)
@@ -314,19 +310,19 @@ func loadBone(routes []route) http.Handler {
 
 	router := bone.New()
 	for _, route := range routes {
-		switch route.method {
+		switch route.Method {
 		case "GET":
-			router.Get(route.path, h)
+			router.Get(route.Path, h)
 		case "POST":
-			router.Post(route.path, h)
+			router.Post(route.Path, h)
 		case "PUT":
-			router.Put(route.path, h)
+			router.Put(route.Path, h)
 		case "PATCH":
-			router.Patch(route.path, h)
+			router.Patch(route.Path, h)
 		case "DELETE":
-			router.Delete(route.path, h)
+			router.Delete(route.Path, h)
 		default:
-			panic("Unknow HTTP method: " + route.method)
+			panic("Unknow HTTP method: " + route.Method)
 		}
 	}
 	return router
@@ -357,7 +353,7 @@ func chiHandleWrite(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, chi.URLParam(r, "name"))
 }
 
-func loadChi(routes []route) http.Handler {
+func loadChi(routes []router.Route) http.Handler {
 	h := httpHandlerFunc
 	if loadTestHandler {
 		h = httpHandlerFuncTest
@@ -367,9 +363,9 @@ func loadChi(routes []route) http.Handler {
 
 	mux := chi.NewRouter()
 	for _, route := range routes {
-		path := re.ReplaceAllString(route.path, "{$1}")
+		path := re.ReplaceAllString(route.Path, "{$1}")
 
-		switch route.method {
+		switch route.Method {
 		case "GET":
 			mux.Get(path, h)
 		case "POST":
@@ -381,7 +377,7 @@ func loadChi(routes []route) http.Handler {
 		case "DELETE":
 			mux.Delete(path, h)
 		default:
-			panic("Unknown HTTP method: " + route.method)
+			panic("Unknown HTTP method: " + route.Method)
 		}
 	}
 	return mux
@@ -417,7 +413,7 @@ func cloudyKitRouterHandlerTest(w http.ResponseWriter, r *http.Request, _ cloudy
 	io.WriteString(w, r.RequestURI)
 }
 
-func loadCloudyKitRouter(routes []route) http.Handler {
+func loadCloudyKitRouter(routes []router.Route) http.Handler {
 	h := cloudyKitRouterHandler
 	if loadTestHandler {
 		h = cloudyKitRouterHandlerTest
@@ -425,7 +421,7 @@ func loadCloudyKitRouter(routes []route) http.Handler {
 
 	router := cloudykitrouter.New()
 	for _, route := range routes {
-		router.AddRoute(route.method, route.path, h)
+		router.AddRoute(route.Method, route.Path, h)
 	}
 	return router
 }
@@ -447,7 +443,7 @@ func dencoHandlerTest(w http.ResponseWriter, r *http.Request, params denco.Param
 	io.WriteString(w, r.RequestURI)
 }
 
-func loadDenco(routes []route) http.Handler {
+func loadDenco(routes []router.Route) http.Handler {
 	h := dencoHandler
 	if loadTestHandler {
 		h = dencoHandlerTest
@@ -456,7 +452,7 @@ func loadDenco(routes []route) http.Handler {
 	mux := denco.NewMux()
 	handlers := make([]denco.Handler, 0, len(routes))
 	for _, route := range routes {
-		handler := mux.Handler(route.method, route.path, h)
+		handler := mux.Handler(route.Method, route.Path, h)
 		handlers = append(handlers, handler)
 	}
 	handler, err := mux.Build(handlers)
@@ -490,7 +486,7 @@ func echoHandlerTest(c echo.Context) error {
 	return nil
 }
 
-func loadEcho(routes []route) http.Handler {
+func loadEcho(routes []router.Route) http.Handler {
 	var h echo.HandlerFunc = echoHandler
 	if loadTestHandler {
 		h = echoHandlerTest
@@ -498,19 +494,19 @@ func loadEcho(routes []route) http.Handler {
 
 	e := echo.New()
 	for _, r := range routes {
-		switch r.method {
+		switch r.Method {
 		case "GET":
-			e.GET(r.path, h)
+			e.GET(r.Path, h)
 		case "POST":
-			e.POST(r.path, h)
+			e.POST(r.Path, h)
 		case "PUT":
-			e.PUT(r.path, h)
+			e.PUT(r.Path, h)
 		case "PATCH":
-			e.PATCH(r.path, h)
+			e.PATCH(r.Path, h)
 		case "DELETE":
-			e.DELETE(r.path, h)
+			e.DELETE(r.Path, h)
 		default:
-			panic("Unknow HTTP method: " + r.method)
+			panic("Unknow HTTP method: " + r.Method)
 		}
 	}
 	return e
@@ -550,7 +546,7 @@ func initGin() {
 	gin.SetMode(gin.ReleaseMode)
 }
 
-func loadGin(routes []route) http.Handler {
+func loadGin(routes []router.Route) http.Handler {
 	h := ginHandle
 	if loadTestHandler {
 		h = ginHandleTest
@@ -558,7 +554,7 @@ func loadGin(routes []route) http.Handler {
 
 	router := gin.New()
 	for _, route := range routes {
-		router.Handle(route.method, route.path, h)
+		router.Handle(route.Method, route.Path, h)
 	}
 	return router
 }
@@ -582,7 +578,7 @@ func gocraftWebHandlerTest(w web.ResponseWriter, r *web.Request) {
 	io.WriteString(w, r.RequestURI)
 }
 
-func loadGocraftWeb(routes []route) http.Handler {
+func loadGocraftWeb(routes []router.Route) http.Handler {
 	h := gocraftWebHandler
 	if loadTestHandler {
 		h = gocraftWebHandlerTest
@@ -590,19 +586,19 @@ func loadGocraftWeb(routes []route) http.Handler {
 
 	router := web.New(gocraftWebContext{})
 	for _, route := range routes {
-		switch route.method {
+		switch route.Method {
 		case "GET":
-			router.Get(route.path, h)
+			router.Get(route.Path, h)
 		case "POST":
-			router.Post(route.path, h)
+			router.Post(route.Path, h)
 		case "PUT":
-			router.Put(route.path, h)
+			router.Put(route.Path, h)
 		case "PATCH":
-			router.Patch(route.path, h)
+			router.Patch(route.Path, h)
 		case "DELETE":
-			router.Delete(route.path, h)
+			router.Delete(route.Path, h)
 		default:
-			panic("Unknow HTTP method: " + route.method)
+			panic("Unknow HTTP method: " + route.Method)
 		}
 	}
 	return router
@@ -632,7 +628,7 @@ func gojiFuncWrite(c goji.C, w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, c.URLParams["name"])
 }
 
-func loadGoji(routes []route) http.Handler {
+func loadGoji(routes []router.Route) http.Handler {
 	h := httpHandlerFunc
 	if loadTestHandler {
 		h = httpHandlerFuncTest
@@ -640,19 +636,19 @@ func loadGoji(routes []route) http.Handler {
 
 	mux := goji.New()
 	for _, route := range routes {
-		switch route.method {
+		switch route.Method {
 		case "GET":
-			mux.Get(route.path, h)
+			mux.Get(route.Path, h)
 		case "POST":
-			mux.Post(route.path, h)
+			mux.Post(route.Path, h)
 		case "PUT":
-			mux.Put(route.path, h)
+			mux.Put(route.Path, h)
 		case "PATCH":
-			mux.Patch(route.path, h)
+			mux.Patch(route.Path, h)
 		case "DELETE":
-			mux.Delete(route.path, h)
+			mux.Delete(route.Path, h)
 		default:
-			panic("Unknown HTTP method: " + route.method)
+			panic("Unknown HTTP method: " + route.Method)
 		}
 	}
 	return mux
@@ -688,7 +684,7 @@ func gojiv2HandlerTest(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, r.RequestURI)
 }
 
-func loadGojiv2(routes []route) http.Handler {
+func loadGojiv2(routes []router.Route) http.Handler {
 	h := gojiv2Handler
 	if loadTestHandler {
 		h = gojiv2HandlerTest
@@ -696,19 +692,19 @@ func loadGojiv2(routes []route) http.Handler {
 
 	mux := gojiv2.NewMux()
 	for _, route := range routes {
-		switch route.method {
+		switch route.Method {
 		case "GET":
-			mux.HandleFunc(gojiv2pat.Get(route.path), h)
+			mux.HandleFunc(gojiv2pat.Get(route.Path), h)
 		case "POST":
-			mux.HandleFunc(gojiv2pat.Post(route.path), h)
+			mux.HandleFunc(gojiv2pat.Post(route.Path), h)
 		case "PUT":
-			mux.HandleFunc(gojiv2pat.Put(route.path), h)
+			mux.HandleFunc(gojiv2pat.Put(route.Path), h)
 		case "PATCH":
-			mux.HandleFunc(gojiv2pat.Patch(route.path), h)
+			mux.HandleFunc(gojiv2pat.Patch(route.Path), h)
 		case "DELETE":
-			mux.HandleFunc(gojiv2pat.Delete(route.path), h)
+			mux.HandleFunc(gojiv2pat.Delete(route.Path), h)
 		default:
-			panic("Unknown HTTP method: " + route.method)
+			panic("Unknown HTTP method: " + route.Method)
 		}
 	}
 	return mux
@@ -744,7 +740,7 @@ func goJsonRestHandlerTest(w rest.ResponseWriter, req *rest.Request) {
 	io.WriteString(w.(io.Writer), req.RequestURI)
 }
 
-func loadGoJsonRest(routes []route) http.Handler {
+func loadGoJsonRest(routes []router.Route) http.Handler {
 	h := goJsonRestHandler
 	if loadTestHandler {
 		h = goJsonRestHandlerTest
@@ -754,7 +750,7 @@ func loadGoJsonRest(routes []route) http.Handler {
 	restRoutes := make([]*rest.Route, 0, len(routes))
 	for _, route := range routes {
 		restRoutes = append(restRoutes,
-			&rest.Route{route.method, route.path, h},
+			&rest.Route{route.Method, route.Path, h},
 		)
 	}
 	router, err := rest.MakeRouter(restRoutes...)
@@ -788,7 +784,7 @@ func goRestfulHandlerTest(r *restful.Request, w *restful.Response) {
 	io.WriteString(w, r.Request.RequestURI)
 }
 
-func loadGoRestful(routes []route) http.Handler {
+func loadGoRestful(routes []router.Route) http.Handler {
 	h := goRestfulHandler
 	if loadTestHandler {
 		h = goRestfulHandlerTest
@@ -800,9 +796,9 @@ func loadGoRestful(routes []route) http.Handler {
 	ws := new(restful.WebService)
 
 	for _, route := range routes {
-		path := re.ReplaceAllString(route.path, "{$1}")
+		path := re.ReplaceAllString(route.Path, "{$1}")
 
-		switch route.method {
+		switch route.Method {
 		case "GET":
 			ws.Route(ws.GET(path).To(h))
 		case "POST":
@@ -814,7 +810,7 @@ func loadGoRestful(routes []route) http.Handler {
 		case "DELETE":
 			ws.Route(ws.DELETE(path).To(h))
 		default:
-			panic("Unknow HTTP method: " + route.method)
+			panic("Unknow HTTP method: " + route.Method)
 		}
 	}
 	wsContainer.Add(ws)
@@ -848,7 +844,7 @@ func gorillaHandlerWrite(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, params["name"])
 }
 
-func loadGorillaMux(routes []route) http.Handler {
+func loadGorillaMux(routes []router.Route) http.Handler {
 	h := httpHandlerFunc
 	if loadTestHandler {
 		h = httpHandlerFuncTest
@@ -858,9 +854,9 @@ func loadGorillaMux(routes []route) http.Handler {
 	m := mux.NewRouter()
 	for _, route := range routes {
 		m.HandleFunc(
-			re.ReplaceAllString(route.path, "{$1}"),
+			re.ReplaceAllString(route.Path, "{$1}"),
 			h,
-		).Methods(route.method)
+		).Methods(route.Method)
 	}
 	return m
 }
@@ -876,7 +872,7 @@ func gowwwRouterHandleWrite(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, gowwwrouter.Parameter(r, "name"))
 }
 
-func loadGowwwRouter(routes []route) http.Handler {
+func loadGowwwRouter(routes []router.Route) http.Handler {
 	h := httpHandlerFunc
 	if loadTestHandler {
 		h = httpHandlerFuncTest
@@ -884,7 +880,7 @@ func loadGowwwRouter(routes []route) http.Handler {
 
 	router := gowwwrouter.New()
 	for _, route := range routes {
-		router.Handle(route.method, route.path, http.HandlerFunc(h))
+		router.Handle(route.Method, route.Path, http.HandlerFunc(h))
 	}
 	return router
 }
@@ -906,7 +902,7 @@ func httpRouterHandleTest(w http.ResponseWriter, r *http.Request, _ httprouter.P
 	io.WriteString(w, r.RequestURI)
 }
 
-func loadHttpRouter(routes []route) http.Handler {
+func loadHttpRouter(routes []router.Route) http.Handler {
 	h := httpRouterHandle
 	if loadTestHandler {
 		h = httpRouterHandleTest
@@ -914,7 +910,7 @@ func loadHttpRouter(routes []route) http.Handler {
 
 	router := httprouter.New()
 	for _, route := range routes {
-		router.Handle(route.method, route.path, h)
+		router.Handle(route.Method, route.Path, h)
 	}
 	return router
 }
@@ -936,7 +932,7 @@ func httpTreeMuxHandlerTest(w http.ResponseWriter, r *http.Request, _ map[string
 	io.WriteString(w, r.RequestURI)
 }
 
-func loadHttpTreeMux(routes []route) http.Handler {
+func loadHttpTreeMux(routes []router.Route) http.Handler {
 	h := httpTreeMuxHandler
 	if loadTestHandler {
 		h = httpTreeMuxHandlerTest
@@ -944,7 +940,7 @@ func loadHttpTreeMux(routes []route) http.Handler {
 
 	router := httptreemux.New()
 	for _, route := range routes {
-		router.Handle(route.method, route.path, h)
+		router.Handle(route.Method, route.Path, h)
 	}
 	return router
 }
@@ -983,7 +979,7 @@ func (h *kochaHandler) kochaHandlerWrite(w http.ResponseWriter, r *http.Request)
 	io.WriteString(w, name)
 }
 
-func loadKocha(routes []route) http.Handler {
+func loadKocha(routes []router.Route) http.Handler {
 	/*h := httpRouterHandle
 	if loadTestHandler {
 		h = httpRouterHandleTest
@@ -999,7 +995,7 @@ func loadKocha(routes []route) http.Handler {
 	recordMap := make(map[string][]urlrouter.Record)
 	for _, route := range routes {
 		var f http.HandlerFunc
-		switch route.method {
+		switch route.Method {
 		case "GET":
 			f = handler.Get
 		case "POST":
@@ -1011,9 +1007,9 @@ func loadKocha(routes []route) http.Handler {
 		case "DELETE":
 			f = handler.Delete
 		}
-		recordMap[route.method] = append(
-			recordMap[route.method],
-			urlrouter.NewRecord(route.path, f),
+		recordMap[route.Method] = append(
+			recordMap[route.Method],
+			urlrouter.NewRecord(route.Path, f),
 		)
 	}
 	for method, records := range recordMap {
@@ -1053,7 +1049,7 @@ func larsNativeHandlerTest(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, r.RequestURI)
 }
 
-func loadLARS(routes []route) http.Handler {
+func loadLARS(routes []router.Route) http.Handler {
 	var h interface{} = larsHandler
 	if loadTestHandler {
 		h = larsHandlerTest
@@ -1062,19 +1058,19 @@ func loadLARS(routes []route) http.Handler {
 	l := lars.New()
 
 	for _, r := range routes {
-		switch r.method {
+		switch r.Method {
 		case "GET":
-			l.Get(r.path, h)
+			l.Get(r.Path, h)
 		case "POST":
-			l.Post(r.path, h)
+			l.Post(r.Path, h)
 		case "PUT":
-			l.Put(r.path, h)
+			l.Put(r.Path, h)
 		case "PATCH":
-			l.Patch(r.path, h)
+			l.Patch(r.Path, h)
 		case "DELETE":
-			l.Delete(r.path, h)
+			l.Delete(r.Path, h)
 		default:
-			panic("Unknow HTTP method: " + r.method)
+			panic("Unknow HTTP method: " + r.Method)
 		}
 	}
 	return l.Serve()
@@ -1111,7 +1107,7 @@ func macaronHandlerTest(c *macaron.Context) string {
 	return c.Req.RequestURI
 }
 
-func loadMacaron(routes []route) http.Handler {
+func loadMacaron(routes []router.Route) http.Handler {
 	var h = []macaron.Handler{macaronHandler}
 	if loadTestHandler {
 		h[0] = macaronHandlerTest
@@ -1119,7 +1115,7 @@ func loadMacaron(routes []route) http.Handler {
 
 	m := macaron.New()
 	for _, route := range routes {
-		m.Handle(route.method, route.path, h)
+		m.Handle(route.Method, route.Path, h)
 	}
 	return m
 }
@@ -1141,7 +1137,7 @@ func initMartini() {
 	martini.Env = martini.Prod
 }
 
-func loadMartini(routes []route) http.Handler {
+func loadMartini(routes []router.Route) http.Handler {
 	var h interface{} = martiniHandler
 	if loadTestHandler {
 		h = httpHandlerFuncTest
@@ -1149,19 +1145,19 @@ func loadMartini(routes []route) http.Handler {
 
 	router := martini.NewRouter()
 	for _, route := range routes {
-		switch route.method {
+		switch route.Method {
 		case "GET":
-			router.Get(route.path, h)
+			router.Get(route.Path, h)
 		case "POST":
-			router.Post(route.path, h)
+			router.Post(route.Path, h)
 		case "PUT":
-			router.Put(route.path, h)
+			router.Put(route.Path, h)
 		case "PATCH":
-			router.Patch(route.path, h)
+			router.Patch(route.Path, h)
 		case "DELETE":
-			router.Delete(route.path, h)
+			router.Delete(route.Path, h)
 		default:
-			panic("Unknow HTTP method: " + route.method)
+			panic("Unknow HTTP method: " + route.Method)
 		}
 	}
 	martini := martini.New()
@@ -1196,7 +1192,7 @@ func patHandlerWrite(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, r.URL.Query().Get(":name"))
 }
 
-func loadPat(routes []route) http.Handler {
+func loadPat(routes []router.Route) http.Handler {
 	h := http.HandlerFunc(httpHandlerFunc)
 	if loadTestHandler {
 		h = http.HandlerFunc(httpHandlerFuncTest)
@@ -1204,17 +1200,17 @@ func loadPat(routes []route) http.Handler {
 
 	m := pat.New()
 	for _, route := range routes {
-		switch route.method {
+		switch route.Method {
 		case "GET":
-			m.Get(route.path, h)
+			m.Get(route.Path, h)
 		case "POST":
-			m.Post(route.path, h)
+			m.Post(route.Path, h)
 		case "PUT":
-			m.Put(route.path, h)
+			m.Put(route.Path, h)
 		case "DELETE":
-			m.Del(route.path, h)
+			m.Del(route.Path, h)
 		default:
-			panic("Unknow HTTP method: " + route.method)
+			panic("Unknow HTTP method: " + route.Method)
 		}
 	}
 	return m
@@ -1252,7 +1248,7 @@ func possumHandlerTest(c *possum.Context) error {
 	return nil
 }
 
-func loadPossum(routes []route) http.Handler {
+func loadPossum(routes []router.Route) http.Handler {
 	h := possumHandler
 	if loadTestHandler {
 		h = possumHandlerTest
@@ -1260,7 +1256,7 @@ func loadPossum(routes []route) http.Handler {
 
 	router := possum.NewServerMux()
 	for _, route := range routes {
-		router.HandleFunc(possumrouter.Simple(route.path), h, possumview.Simple("text/html", "utf-8"))
+		router.HandleFunc(possumrouter.Simple(route.Path), h, possumview.Simple("text/html", "utf-8"))
 	}
 	return router
 }
@@ -1282,7 +1278,7 @@ func r2routerHandleTest(w http.ResponseWriter, req *http.Request, _ r2router.Par
 	io.WriteString(w, req.RequestURI)
 }
 
-func loadR2router(routes []route) http.Handler {
+func loadR2router(routes []router.Route) http.Handler {
 	h := r2routerHandler
 	if loadTestHandler {
 		h = r2routerHandleTest
@@ -1290,7 +1286,7 @@ func loadR2router(routes []route) http.Handler {
 
 	router := r2router.NewRouter()
 	for _, r := range routes {
-		router.AddHandler(r.method, r.path, h)
+		router.AddHandler(r.Method, r.Path, h)
 	}
 	return router
 }
@@ -1433,7 +1429,7 @@ func rivetHandlerTest(c *rivet.Context) {
 	c.WriteString(c.Req.RequestURI)
 }
 
-func loadRivet(routes []route) http.Handler {
+func loadRivet(routes []router.Route) http.Handler {
 	var h interface{} = rivetHandler
 	if loadTestHandler {
 		h = rivetHandlerTest
@@ -1441,7 +1437,7 @@ func loadRivet(routes []route) http.Handler {
 
 	router := rivet.New()
 	for _, route := range routes {
-		router.Handle(route.method, route.path, h)
+		router.Handle(route.Method, route.Path, h)
 	}
 	return router
 }
@@ -1470,7 +1466,7 @@ func initTango() {
 	llog.SetOutputLevel(llog.Lnone)
 }
 
-func loadTango(routes []route) http.Handler {
+func loadTango(routes []router.Route) http.Handler {
 	h := tangoHandler
 	if loadTestHandler {
 		h = tangoHandlerTest
@@ -1478,7 +1474,7 @@ func loadTango(routes []route) http.Handler {
 
 	tg := tango.NewWithLog(llog.Std)
 	for _, route := range routes {
-		tg.Route(route.method, route.path, h)
+		tg.Route(route.Method, route.Path, h)
 	}
 	return tg
 }
@@ -1494,7 +1490,7 @@ func tigerTonicHandlerWrite(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, r.URL.Query().Get("name"))
 }
 
-func loadTigerTonic(routes []route) http.Handler {
+func loadTigerTonic(routes []router.Route) http.Handler {
 	h := httpHandlerFunc
 	if loadTestHandler {
 		h = httpHandlerFuncTest
@@ -1503,7 +1499,7 @@ func loadTigerTonic(routes []route) http.Handler {
 	re := regexp.MustCompile(":([^/]*)")
 	mux := tigertonic.NewTrieServeMux()
 	for _, route := range routes {
-		mux.HandleFunc(route.method, re.ReplaceAllString(route.path, "{$1}"), h)
+		mux.HandleFunc(route.Method, re.ReplaceAllString(route.Path, "{$1}"), h)
 	}
 	return mux
 }
@@ -1529,7 +1525,7 @@ func initTraffic() {
 	traffic.SetVar("env", "bench")
 }
 
-func loadTraffic(routes []route) http.Handler {
+func loadTraffic(routes []router.Route) http.Handler {
 	h := trafficHandler
 	if loadTestHandler {
 		h = trafficHandlerTest
@@ -1537,19 +1533,19 @@ func loadTraffic(routes []route) http.Handler {
 
 	router := traffic.New()
 	for _, route := range routes {
-		switch route.method {
+		switch route.Method {
 		case "GET":
-			router.Get(route.path, h)
+			router.Get(route.Path, h)
 		case "POST":
-			router.Post(route.path, h)
+			router.Post(route.Path, h)
 		case "PUT":
-			router.Put(route.path, h)
+			router.Put(route.Path, h)
 		case "PATCH":
-			router.Patch(route.path, h)
+			router.Patch(route.Path, h)
 		case "DELETE":
-			router.Delete(route.path, h)
+			router.Delete(route.Path, h)
 		default:
-			panic("Unknow HTTP method: " + route.method)
+			panic("Unknow HTTP method: " + route.Method)
 		}
 	}
 	return router
@@ -1581,7 +1577,7 @@ func vulcanHandlerWrite(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, r.URL.Query().Get("name"))
 }
 
-func loadVulcan(routes []route) http.Handler {
+func loadVulcan(routes []router.Route) http.Handler {
 	h := httpHandlerFunc
 	if loadTestHandler {
 		h = httpHandlerFuncTest
@@ -1590,8 +1586,8 @@ func loadVulcan(routes []route) http.Handler {
 	re := regexp.MustCompile(":([^/]*)")
 	mux := vulcan.NewMux()
 	for _, route := range routes {
-		path := re.ReplaceAllString(route.path, "<$1>")
-		expr := fmt.Sprintf(`Method("%s") && Path("%s")`, route.method, path)
+		path := re.ReplaceAllString(route.Path, "<$1>")
+		expr := fmt.Sprintf(`Method("%s") && Path("%s")`, route.Method, path)
 		if err := mux.HandleFunc(expr, h); err != nil {
 			panic(err)
 		}
