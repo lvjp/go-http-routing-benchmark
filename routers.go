@@ -750,7 +750,7 @@ func loadGoJsonRest(routes []router.Route) http.Handler {
 	restRoutes := make([]*rest.Route, 0, len(routes))
 	for _, route := range routes {
 		restRoutes = append(restRoutes,
-			&rest.Route{route.Method, route.Path, h},
+			&rest.Route{HttpMethod: route.Method, PathExp: route.Path, Func: h},
 		)
 	}
 	router, err := rest.MakeRouter(restRoutes...)
@@ -764,7 +764,7 @@ func loadGoJsonRest(routes []router.Route) http.Handler {
 func loadGoJsonRestSingle(method, path string, hfunc rest.HandlerFunc) http.Handler {
 	api := rest.NewApi()
 	router, err := rest.MakeRouter(
-		&rest.Route{method, path, hfunc},
+		&rest.Route{HttpMethod: method, PathExp: path, Func: hfunc},
 	)
 	if err != nil {
 		log.Fatal(err)
