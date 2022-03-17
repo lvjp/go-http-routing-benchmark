@@ -1,0 +1,30 @@
+---
+
+on: push
+
+jobs:
+  go-lint:
+    name: Linting
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3.0.0
+      - uses: actions/setup-go@v3.0.0
+        with:
+          go-version: 1.17.8
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3.1.0
+        with:
+          version: v1.44.2
+          skip-go-installation: true
+
+  go-test:
+    name: Run tests
+    runs-on: ubuntu-20.04
+    needs: go-lint
+    steps:
+      - uses: actions/checkout@v3.0.0
+      - uses: actions/setup-go@v3.0.0
+        with:
+          go-version: 1.17.8
+      - run: go build -v ./...
+      - run: go test
