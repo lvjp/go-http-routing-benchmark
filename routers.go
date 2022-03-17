@@ -23,7 +23,6 @@ import (
 	"github.com/bmizerany/pat"
 	"github.com/go-playground/lars"
 
-	// "github.com/daryl/zeus"
 	cloudykitrouter "github.com/cloudykit/router"
 	"github.com/dimfeld/httptreemux"
 	"github.com/emicklei/go-restful"
@@ -1610,52 +1609,6 @@ func loadVulcanSingle(method, path string, handler http.HandlerFunc) http.Handle
 	}
 	return mux
 }
-
-// Zeus
-// func zeusHandlerWrite(w http.ResponseWriter, r *http.Request) {
-// 	io.WriteString(w, zeus.Var(r, "name"))
-// }
-
-// func loadZeus(routes []route) http.Handler {
-// 	h := http.HandlerFunc(httpHandlerFunc)
-// 	if loadTestHandler {
-// 		h = http.HandlerFunc(httpHandlerFuncTest)
-// 	}
-
-// 	m := zeus.New()
-// 	for _, route := range routes {
-// 		switch route.method {
-// 		case "GET":
-// 			m.GET(route.path, h)
-// 		case "POST":
-// 			m.POST(route.path, h)
-// 		case "PUT":
-// 			m.PUT(route.path, h)
-// 		case "DELETE":
-// 			m.DELETE(route.path, h)
-// 		default:
-// 			panic("Unknow HTTP method: " + route.method)
-// 		}
-// 	}
-// 	return m
-// }
-
-// func loadZeusSingle(method, path string, handler http.HandlerFunc) http.Handler {
-// 	m := zeus.New()
-// 	switch method {
-// 	case "GET":
-// 		m.GET(path, handler)
-// 	case "POST":
-// 		m.POST(path, handler)
-// 	case "PUT":
-// 		m.PUT(path, handler)
-// 	case "DELETE":
-// 		m.DELETE(path, handler)
-// 	default:
-// 		panic("Unknow HTTP method: " + method)
-// 	}
-// 	return m
-// }
 
 // Usage notice
 func main() {

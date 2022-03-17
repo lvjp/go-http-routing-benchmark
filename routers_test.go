@@ -44,7 +44,6 @@ var (
 		{"TigerTonic", loadTigerTonic},
 		{"Traffic", loadTraffic},
 		{"Vulcan", loadVulcan},
-		// {"Zeus", loadZeus},
 	}
 
 	// all APIs

@@ -68,7 +68,6 @@ var (
 	gplusTigerTonic      http.Handler
 	gplusTraffic         http.Handler
 	gplusVulcan          http.Handler
-	// gplusZeus        http.Handler
 )
 
 func init() {
@@ -170,9 +169,6 @@ func init() {
 	calcMem("Vulcan", func() {
 		gplusVulcan = loadVulcan(gplusAPI)
 	})
-	// calcMem("Zeus", func() {
-	// 	gplusZeus = loadZeus(gplusAPI)
-	// })
 
 	println()
 }
@@ -308,11 +304,6 @@ func BenchmarkVulcan_GPlusStatic(b *testing.B) {
 	benchRequest(b, gplusVulcan, req)
 }
 
-// func BenchmarkZeus_GPlusStatic(b *testing.B) {
-// 	req, _ := http.NewRequest("GET", "/people", nil)
-// 	benchRequest(b, gplusZeus, req)
-// }
-
 // One Param
 func BenchmarkAce_GPlusParam(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/people/118051310819094153327", nil)
@@ -443,11 +434,6 @@ func BenchmarkVulcan_GPlusParam(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/people/118051310819094153327", nil)
 	benchRequest(b, gplusVulcan, req)
 }
-
-// func BenchmarkZeus_GPlusParam(b *testing.B) {
-// 	req, _ := http.NewRequest("GET", "/people/118051310819094153327", nil)
-// 	benchRequest(b, gplusZeus, req)
-// }
 
 // Two Params
 func BenchmarkAce_GPlus2Params(b *testing.B) {
@@ -580,11 +566,6 @@ func BenchmarkVulcan_GPlus2Params(b *testing.B) {
 	benchRequest(b, gplusVulcan, req)
 }
 
-// func BenchmarkZeus_GPlus2Params(b *testing.B) {
-// 	req, _ := http.NewRequest("GET", "/people/118051310819094153327/activities/123456789", nil)
-// 	benchRequest(b, gplusZeus, req)
-// }
-
 // All Routes
 func BenchmarkAce_GPlusAll(b *testing.B) {
 	benchRoutes(b, gplusAce, gplusAPI)
@@ -683,7 +664,3 @@ func BenchmarkTraffic_GPlusAll(b *testing.B) {
 func BenchmarkVulcan_GPlusAll(b *testing.B) {
 	benchRoutes(b, gplusVulcan, gplusAPI)
 }
-
-// func BenchmarkZeus_GPlusAll(b *testing.B) {
-// 	benchRoutes(b, gplusZeus, gplusAPI)
-// }
