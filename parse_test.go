@@ -65,8 +65,8 @@ func BenchmarkNewParse(b *testing.B) {
 		url    string
 	}{
 		{"static", "GET", "/1/users"},
-		{"1param", "GET", "/1/classes/go"},
-		{"2params", "GET", "/1/classes/go/123456789"},
+		{"param/1", "GET", "/1/classes/go"},
+		{"param/2", "GET", "/1/classes/go/123456789"},
 	}
 
 	for name, builder := range router.GetRegistry() {

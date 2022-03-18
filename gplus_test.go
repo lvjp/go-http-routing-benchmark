@@ -45,8 +45,8 @@ func BenchmarkNewGPlus(b *testing.B) {
 		url    string
 	}{
 		{"static", "GET", "/people"},
-		{"1param", "GET", "/people/118051310819094153327"},
-		{"2param", "GET", "/people/118051310819094153327/activities/123456789"},
+		{"param/1", "GET", "/people/118051310819094153327"},
+		{"param/2", "GET", "/people/118051310819094153327/activities/123456789"},
 	}
 
 	for name, builder := range router.GetRegistry() {
