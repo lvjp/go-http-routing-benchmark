@@ -171,7 +171,7 @@ var staticRoutes = []router.Route{
 }
 
 // All routes
-func BenchmarkNewStaticAll(b *testing.B) {
+func BenchmarkStaticAll(b *testing.B) {
 	for name, builder := range router.GetRegistry() {
 		router := builder.Build(staticRoutes, router.SkipDataMode)
 		b.Run(name, func(b *testing.B) {

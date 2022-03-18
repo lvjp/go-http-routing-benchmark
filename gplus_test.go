@@ -38,7 +38,7 @@ var gplusAPI = []router.Route{
 }
 
 // Static
-func BenchmarkNewGPlus(b *testing.B) {
+func BenchmarkGPlus(b *testing.B) {
 	benchs := []struct {
 		name   string
 		method string

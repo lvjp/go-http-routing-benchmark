@@ -58,7 +58,7 @@ var parseAPI = []router.Route{
 }
 
 // Static
-func BenchmarkNewParse(b *testing.B) {
+func BenchmarkParse(b *testing.B) {
 	benchs := []struct {
 		name   string
 		method string

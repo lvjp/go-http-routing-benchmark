@@ -67,7 +67,7 @@ func (mtc *microTestCase) matcher(pt router.ParamType) string {
 }
 
 // Micro Benchmarks
-func BenchmarkNewMicro(b *testing.B) {
+func BenchmarkMicro(b *testing.B) {
 	benchs := []microTestCase{
 		{
 			"param/1",

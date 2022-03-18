@@ -276,7 +276,7 @@ var githubAPI = []router.Route{
 }
 
 // Static
-func BenchmarkNewGithub(b *testing.B) {
+func BenchmarkGithub(b *testing.B) {
 	benchs := []struct {
 		name   string
 		method string
