@@ -53,8 +53,6 @@ func (m *mockResponseWriter) WriteString(s string) (n int, err error) {
 
 func (m *mockResponseWriter) WriteHeader(int) {}
 
-var nullLogger *log.Logger
-
 // flag indicating if the normal or the test handler should be loaded
 var loadTestHandler = false
 
@@ -65,7 +63,6 @@ func init() {
 
 	// makes logging 'webscale' (ignores them)
 	log.SetOutput(new(mockResponseWriter))
-	nullLogger = log.New(new(mockResponseWriter), "", 0)
 
 	initBeego()
 	initGin()
@@ -76,7 +73,7 @@ func init() {
 func httpHandlerFunc(_ http.ResponseWriter, _ *http.Request) {}
 
 func httpHandlerFuncTest(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, r.RequestURI)
+	_, _ = io.WriteString(w, r.RequestURI)
 }
 
 // beego
@@ -143,9 +140,8 @@ func loadBeegoSingle(method, path string, handler beego.FilterFunc) http.Handler
 }
 
 // chi
-// chi
 func chiHandleWrite(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, chi.URLParam(r, "name"))
+	_, _ = io.WriteString(w, chi.URLParam(r, "name"))
 }
 
 func loadChi(routes []router.Route) http.Handler {
@@ -203,12 +199,12 @@ func echoHandler(c echo.Context) error {
 }
 
 func echoHandlerWrite(c echo.Context) error {
-	io.WriteString(c.Response(), c.Param("name"))
+	_, _ = io.WriteString(c.Response(), c.Param("name"))
 	return nil
 }
 
 func echoHandlerTest(c echo.Context) error {
-	io.WriteString(c.Response(), c.Request().RequestURI)
+	_, _ = io.WriteString(c.Response(), c.Request().RequestURI)
 	return nil
 }
 
@@ -261,11 +257,11 @@ func loadEchoSingle(method, path string, h echo.HandlerFunc) http.Handler {
 func ginHandle(_ *gin.Context) {}
 
 func ginHandleWrite(c *gin.Context) {
-	io.WriteString(c.Writer, c.Params.ByName("name"))
+	_, _ = io.WriteString(c.Writer, c.Params.ByName("name"))
 }
 
 func ginHandleTest(c *gin.Context) {
-	io.WriteString(c.Writer, c.Request.RequestURI)
+	_, _ = io.WriteString(c.Writer, c.Request.RequestURI)
 }
 
 func initGin() {
@@ -295,11 +291,11 @@ func loadGinSingle(method, path string, handle gin.HandlerFunc) http.Handler {
 func goRestfulHandler(r *restful.Request, w *restful.Response) {}
 
 func goRestfulHandlerWrite(r *restful.Request, w *restful.Response) {
-	io.WriteString(w, r.PathParameter("name"))
+	_, _ = io.WriteString(w, r.PathParameter("name"))
 }
 
 func goRestfulHandlerTest(r *restful.Request, w *restful.Response) {
-	io.WriteString(w, r.Request.RequestURI)
+	_, _ = io.WriteString(w, r.Request.RequestURI)
 }
 
 func loadGoRestful(routes []router.Route) http.Handler {
@@ -359,7 +355,7 @@ func loadGoRestfulSingle(method, path string, handler restful.RouteFunction) htt
 // gorilla/mux
 func gorillaHandlerWrite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	io.WriteString(w, params["name"])
+	_, _ = io.WriteString(w, params["name"])
 }
 
 func loadGorillaMux(routes []router.Route) http.Handler {
@@ -387,7 +383,7 @@ func loadGorillaMuxSingle(method, path string, handler http.HandlerFunc) http.Ha
 
 // gowww/router
 func gowwwRouterHandleWrite(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, gowwwrouter.Parameter(r, "name"))
+	_, _ = io.WriteString(w, gowwwrouter.Parameter(r, "name"))
 }
 
 func loadGowwwRouter(routes []router.Route) http.Handler {
@@ -413,11 +409,11 @@ func loadGowwwRouterSingle(method, path string, handler http.Handler) http.Handl
 func httpRouterHandle(_ http.ResponseWriter, _ *http.Request, _ httprouter.Params) {}
 
 func httpRouterHandleWrite(w http.ResponseWriter, _ *http.Request, ps httprouter.Params) {
-	io.WriteString(w, ps.ByName("name"))
+	_, _ = io.WriteString(w, ps.ByName("name"))
 }
 
 func httpRouterHandleTest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	io.WriteString(w, r.RequestURI)
+	_, _ = io.WriteString(w, r.RequestURI)
 }
 
 func loadHttpRouter(routes []router.Route) http.Handler {
@@ -443,11 +439,11 @@ func loadHttpRouterSingle(method, path string, handle httprouter.Handle) http.Ha
 func httpTreeMuxHandler(_ http.ResponseWriter, _ *http.Request, _ map[string]string) {}
 
 func httpTreeMuxHandlerWrite(w http.ResponseWriter, _ *http.Request, vars map[string]string) {
-	io.WriteString(w, vars["name"])
+	_, _ = io.WriteString(w, vars["name"])
 }
 
 func httpTreeMuxHandlerTest(w http.ResponseWriter, r *http.Request, _ map[string]string) {
-	io.WriteString(w, r.RequestURI)
+	_, _ = io.WriteString(w, r.RequestURI)
 }
 
 func loadHttpTreeMux(routes []router.Route) http.Handler {
@@ -501,7 +497,7 @@ func loadMacaronSingle(method, path string, handler interface{}) http.Handler {
 
 // pat
 func patHandlerWrite(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, r.URL.Query().Get(":name"))
+	_, _ = io.WriteString(w, r.URL.Query().Get(":name"))
 }
 
 func loadPat(routes []router.Route) http.Handler {

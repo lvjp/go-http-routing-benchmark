@@ -87,10 +87,10 @@ func skipDataModeHandler(c aero.Context) error {
 }
 
 func writeParameterMode(ctx aero.Context) error {
-	io.WriteString(ctx.Response().Internal(), ctx.Get("name"))
+	_, _ = io.WriteString(ctx.Response().Internal(), ctx.Get("name"))
 	return nil
 }
 func writePathModeHandler(ctx aero.Context) error {
-	io.WriteString(ctx.Response().Internal(), ctx.Request().Path())
+	_, _ = io.WriteString(ctx.Response().Internal(), ctx.Request().Path())
 	return nil
 }
