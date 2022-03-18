@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -9,25 +10,6 @@ import (
 )
 
 var (
-	// load functions of all routers
-	routers = []struct {
-		name string
-		load func(routes []router.Route) http.Handler
-	}{
-		{"Beego", loadBeego},
-		{"Chi", loadChi},
-		{"Echo", loadEcho},
-		{"Gin", loadGin},
-		{"GoRestful", loadGoRestful},
-		{"GorillaMux", loadGorillaMux},
-		{"GowwwRouter", loadGowwwRouter},
-		{"HttpRouter", loadHttpRouter},
-		{"HttpTreeMux", loadHttpTreeMux},
-		{"Macaron", loadMacaron},
-		{"Pat", loadPat},
-		// {"Revel", loadRevel},
-	}
-
 	// all APIs
 	apis = []struct {
 		name   string
@@ -40,34 +22,16 @@ var (
 	}
 )
 
-func TestRouters(t *testing.T) {
-	loadTestHandler = true
-
-	for name, builder := range router.GetRegistry() {
-		name := name
-		builder := builder
-		routers = append(
-			routers,
-			struct {
-				name string
-				load func(routes []router.Route) http.Handler
-			}{
-				name: name,
-				load: func(routes []router.Route) http.Handler {
-					return builder.Build(routes, router.WritePathMode)
-				},
-			})
-	}
-
-	for _, router := range routers {
+func TestRouters_pathMode(t *testing.T) {
+	for _, builder := range router.GetRegistry() {
 		req, _ := http.NewRequest("GET", "/", nil)
 		u := req.URL
 		rq := u.RawQuery
 
-		t.Run(router.name, func(t *testing.T) {
+		t.Run(builder.Name(), func(t *testing.T) {
 			for _, api := range apis {
 				t.Run(api.name, func(t *testing.T) {
-					r := router.load(api.routes)
+					r := builder.Build(api.routes, router.WritePathMode)
 
 					for _, route := range api.routes {
 						w := httptest.NewRecorder()
@@ -79,7 +43,7 @@ func TestRouters(t *testing.T) {
 						if w.Code != 200 || w.Body.String() != route.Path {
 							t.Errorf(
 								"%s in API %s: %d - %s; expected %s %s\n",
-								router.name, api.name, w.Code, w.Body.String(), route.Method, route.Path,
+								builder.Name(), api.name, w.Code, w.Body.String(), route.Method, route.Path,
 							)
 						}
 					}
@@ -87,6 +51,42 @@ func TestRouters(t *testing.T) {
 			}
 		})
 	}
+}
 
-	loadTestHandler = false
+func TestRouters_parameterMode(t *testing.T) {
+	name := "gordon"
+	method := "GET"
+	path := "/user/" + name
+
+	for _, builder := range router.GetRegistry() {
+		req, _ := http.NewRequest(method, path, nil)
+		u := req.URL
+		rq := u.RawQuery
+
+		t.Run(builder.Name(), func(t *testing.T) {
+			var matcher string
+			switch builder.ParamType() {
+			case router.ParamColonType:
+				matcher = "/user/:name"
+			case router.ParamBraceType:
+				matcher = "/user/{name}"
+			default:
+				panic(fmt.Sprint("Unsupported param type: ", builder.ParamType()))
+			}
+
+			r := builder.BuildSingle(method, matcher, router.WriteParameterMode)
+			w := httptest.NewRecorder()
+			req.Method = method
+			req.RequestURI = path
+			u.Path = path
+			u.RawQuery = rq
+			r.ServeHTTP(w, req)
+			if w.Code != 200 || w.Body.String() != name {
+				t.Errorf(
+					"%s: %d - %s; expected '%#v' '%#v'\n",
+					builder.Name(), w.Code, w.Body.String(), method, name,
+				)
+			}
+		})
+	}
 }

@@ -12,7 +12,7 @@ func Register(builder Builder) {
 	}
 
 	if _, exist := routerRegistry[builder.Name()]; exist {
-		panic(fmt.Sprint("Already registered builder:", builder.Name()))
+		panic(fmt.Sprint("Already registered builder: ", builder.Name()))
 	}
 
 	routerRegistry[builder.Name()] = builder

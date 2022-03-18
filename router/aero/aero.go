@@ -21,7 +21,7 @@ func (a *aeroBuilder) Name() string {
 }
 
 func (a *aeroBuilder) ParamType() router.ParamType {
-	return router.ParamBraceType
+	return router.ParamColonType
 }
 
 func (a *aeroBuilder) Build(routes []router.Route, mode router.Mode) http.Handler {
@@ -76,7 +76,7 @@ func getHandler(mode router.Mode) aero.Handler {
 	case router.WritePathMode:
 		return writePathModeHandler
 	case router.WriteParameterMode:
-		return writeParameterMode
+		return writeParameterModeHandler
 	default:
 		panic(fmt.Sprint("unknow mode:", mode))
 	}
@@ -86,7 +86,7 @@ func skipDataModeHandler(c aero.Context) error {
 	return nil
 }
 
-func writeParameterMode(ctx aero.Context) error {
+func writeParameterModeHandler(ctx aero.Context) error {
 	_, _ = io.WriteString(ctx.Response().Internal(), ctx.Get("name"))
 	return nil
 }
