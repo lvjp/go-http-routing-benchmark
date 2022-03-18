@@ -6,67 +6,10 @@ package main
 
 import (
 	"net/http"
-	"os"
-	"regexp"
-	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/lvjp/go-http-routing-benchmark/router"
 )
-
-var benchRe *regexp.Regexp
-
-func isTested(name string) bool {
-	if benchRe == nil {
-		// Get -test.bench flag value (not accessible via flag package)
-		bench := ""
-		for _, arg := range os.Args {
-			if strings.HasPrefix(arg, "-test.bench=") {
-				// ignore the benchmark name after an underscore
-				bench = strings.SplitN(arg[12:], "_", 2)[0]
-				break
-			}
-		}
-
-		// Compile RegExp to match Benchmark names
-		var err error
-		benchRe, err = regexp.Compile(bench)
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-	return benchRe.MatchString(name)
-}
-
-func calcMem(name string, load func()) {
-	if !isTested(name) {
-		return
-	}
-
-	m := new(runtime.MemStats)
-
-	// before
-	// force GC multiple times, since Go is using a generational GC
-	// TODO: find a better approach
-	runtime.GC()
-	runtime.GC()
-	runtime.GC()
-	runtime.GC()
-	runtime.ReadMemStats(m)
-	before := m.HeapAlloc
-
-	load()
-
-	// after
-	runtime.GC()
-	runtime.GC()
-	runtime.GC()
-	runtime.GC()
-	runtime.ReadMemStats(m)
-	after := m.HeapAlloc
-	println("   "+name+":", after-before, "Bytes")
-}
 
 func benchRequest(b *testing.B, router http.Handler, r *http.Request) {
 	w := new(mockResponseWriter)
@@ -104,14 +47,57 @@ func benchRoutes(b *testing.B, router http.Handler, routes []router.Route) {
 }
 
 // Micro Benchmarks
+func BenchmarkNewMicro(b *testing.B) {
+	benchs := []struct {
+		name   string
+		method string
+		colon  string
+		brace  string
+		url    string
+	}{
+		{"param/1", "GET", "/user/:name", "/user/{name}", "/user/gordon"},
+		{"param/5", "GET", fiveColon, fiveBrace, fiveRoute},
+		{"param/20", "GET", twentyColon, twentyBrace, twentyRoute},
+	}
 
-// Route with Param (no write)
-func BenchmarkAce_Param(b *testing.B) {
-	router := loadAceSingle("GET", "/user/:name", aceHandle)
+	for name, builder := range router.GetRegistry() {
+		b.Run(name, func(b *testing.B) {
+			for _, bench := range benchs {
+				var matcher string
+				switch builder.ParamType() {
+				case router.ParamColonType:
+					matcher = bench.colon
+				case router.ParamBraceType:
+					matcher = bench.brace
+				default:
+					b.Fatal("Unsupported param type:", builder.ParamType())
+				}
+				r := builder.BuildSingle("GET", matcher, router.SkipDataMode)
 
-	r, _ := http.NewRequest("GET", "/user/gordon", nil)
-	benchRequest(b, router, r)
+				req, _ := http.NewRequest(bench.method, bench.url, nil)
+				b.Run(bench.name, func(b *testing.B) {
+					benchRequest(b, r, req)
+				})
+			}
+
+			var matcher string
+			switch builder.ParamType() {
+			case router.ParamColonType:
+				matcher = "/user/:name"
+			case router.ParamBraceType:
+				matcher = "/user/{name}"
+			default:
+				b.Fatal("Unsupported param type:", builder.ParamType())
+			}
+			r := builder.BuildSingle("GET", matcher, router.WriteParameterMode)
+			req, _ := http.NewRequest("GET", "/user/gordon", nil)
+			b.Run("param/write", func(b *testing.B) {
+				benchRequest(b, r, req)
+			})
+		})
+	}
 }
+
 func BenchmarkAero_Param(b *testing.B) {
 	router := loadAeroSingle("GET", "/user/:name", aeroHandler)
 
@@ -309,12 +295,6 @@ const fiveColon = "/:a/:b/:c/:d/:e"
 const fiveBrace = "/{a}/{b}/{c}/{d}/{e}"
 const fiveRoute = "/test/test/test/test/test"
 
-func BenchmarkAce_Param5(b *testing.B) {
-	router := loadAceSingle("GET", fiveColon, aceHandle)
-
-	r, _ := http.NewRequest("GET", fiveRoute, nil)
-	benchRequest(b, router, r)
-}
 func BenchmarkAero_Param5(b *testing.B) {
 	router := loadAeroSingle("GET", fiveColon, aeroHandler)
 
@@ -512,12 +492,6 @@ const twentyColon = "/:a/:b/:c/:d/:e/:f/:g/:h/:i/:j/:k/:l/:m/:n/:o/:p/:q/:r/:s/:
 const twentyBrace = "/{a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}/{i}/{j}/{k}/{l}/{m}/{n}/{o}/{p}/{q}/{r}/{s}/{t}"
 const twentyRoute = "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t"
 
-func BenchmarkAce_Param20(b *testing.B) {
-	router := loadAceSingle("GET", twentyColon, aceHandle)
-
-	r, _ := http.NewRequest("GET", twentyRoute, nil)
-	benchRequest(b, router, r)
-}
 func BenchmarkAero_Param20(b *testing.B) {
 	router := loadAeroSingle("GET", twentyBrace, aeroHandler)
 
@@ -711,12 +685,6 @@ func BenchmarkVulcan_Param20(b *testing.B) {
 }
 
 // Route with Param and write
-func BenchmarkAce_ParamWrite(b *testing.B) {
-	router := loadAceSingle("GET", "/user/:name", aceHandleWrite)
-
-	r, _ := http.NewRequest("GET", "/user/gordon", nil)
-	benchRequest(b, router, r)
-}
 func BenchmarkAero_ParamWrite(b *testing.B) {
 	router := loadAeroSingle("GET", "/user/:name", aeroHandlerTest)
 

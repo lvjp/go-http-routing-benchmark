@@ -46,7 +46,6 @@ import (
 	urlrouter "github.com/naoina/kocha-urlrouter"
 	_ "github.com/naoina/kocha-urlrouter/doublearray"
 	"github.com/pilu/traffic"
-	"github.com/plimble/ace"
 	"github.com/rcrowley/go-tigertonic"
 
 	// "github.com/revel/pathtree"
@@ -104,36 +103,6 @@ func httpHandlerFunc(_ http.ResponseWriter, _ *http.Request) {}
 
 func httpHandlerFuncTest(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, r.RequestURI)
-}
-
-// Ace
-func aceHandle(_ *ace.C) {}
-
-func aceHandleWrite(c *ace.C) {
-	io.WriteString(c.Writer, c.Param("name"))
-}
-
-func aceHandleTest(c *ace.C) {
-	io.WriteString(c.Writer, c.Request.RequestURI)
-}
-
-func loadAce(routes []router.Route) http.Handler {
-	h := []ace.HandlerFunc{aceHandle}
-	if loadTestHandler {
-		h = []ace.HandlerFunc{aceHandleTest}
-	}
-
-	router := ace.New()
-	for _, route := range routes {
-		router.Handle(route.Method, route.Path, h)
-	}
-	return router
-}
-
-func loadAceSingle(method, path string, handle ace.HandlerFunc) http.Handler {
-	router := ace.New()
-	router.Handle(method, path, []ace.HandlerFunc{handle})
-	return router
 }
 
 // Aero

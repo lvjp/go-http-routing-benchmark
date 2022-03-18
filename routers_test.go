@@ -14,7 +14,6 @@ var (
 		name string
 		load func(routes []router.Route) http.Handler
 	}{
-		{"Ace", loadAce},
 		{"Aero", loadAero},
 		{"Bear", loadBear},
 		{"Beego", loadBeego},
@@ -63,29 +62,49 @@ var (
 func TestRouters(t *testing.T) {
 	loadTestHandler = true
 
+	for name, builder := range router.GetRegistry() {
+		name := name
+		builder := builder
+		routers = append(
+			routers,
+			struct {
+				name string
+				load func(routes []router.Route) http.Handler
+			}{
+				name: name,
+				load: func(routes []router.Route) http.Handler {
+					return builder.Build(routes, router.WritePathMode)
+				},
+			})
+	}
+
 	for _, router := range routers {
 		req, _ := http.NewRequest("GET", "/", nil)
 		u := req.URL
 		rq := u.RawQuery
 
-		for _, api := range apis {
-			r := router.load(api.routes)
+		t.Run(router.name, func(t *testing.T) {
+			for _, api := range apis {
+				t.Run(api.name, func(t *testing.T) {
+					r := router.load(api.routes)
 
-			for _, route := range api.routes {
-				w := httptest.NewRecorder()
-				req.Method = route.Method
-				req.RequestURI = route.Path
-				u.Path = route.Path
-				u.RawQuery = rq
-				r.ServeHTTP(w, req)
-				if w.Code != 200 || w.Body.String() != route.Path {
-					t.Errorf(
-						"%s in API %s: %d - %s; expected %s %s\n",
-						router.name, api.name, w.Code, w.Body.String(), route.Method, route.Path,
-					)
-				}
+					for _, route := range api.routes {
+						w := httptest.NewRecorder()
+						req.Method = route.Method
+						req.RequestURI = route.Path
+						u.Path = route.Path
+						u.RawQuery = rq
+						r.ServeHTTP(w, req)
+						if w.Code != 200 || w.Body.String() != route.Path {
+							t.Errorf(
+								"%s in API %s: %d - %s; expected %s %s\n",
+								router.name, api.name, w.Code, w.Body.String(), route.Method, route.Path,
+							)
+						}
+					}
+				})
 			}
-		}
+		})
 	}
 
 	loadTestHandler = false
