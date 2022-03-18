@@ -11,14 +11,12 @@ Of course the tested routers can be used for any kind of HTTP request → handle
 
  * [Beego](http://beego.me/)
  * [go-json-rest](https://github.com/ant0ine/go-json-rest)
- * [Denco](https://github.com/naoina/denco)
  * [Gocraft Web](https://github.com/gocraft/web)
  * [Goji](https://github.com/zenazn/goji/)
  * [Gorilla Mux](http://www.gorillatoolkit.org/pkg/mux)
  * [http.ServeMux](http://golang.org/pkg/net/http/#ServeMux)
  * [HttpRouter](https://github.com/julienschmidt/httprouter)
  * [HttpTreeMux](https://github.com/dimfeld/httptreemux)
- * [Kocha-urlrouter](https://github.com/naoina/kocha-urlrouter)
  * [Martini](https://github.com/go-martini/martini)
  * [Pat](https://github.com/bmizerany/pat)
  * [Possum](https://github.com/mikespook/possum)
@@ -364,7 +362,7 @@ Secondly, the broad range of functions of some of the frameworks comes at a high
 
 Last but not least, we have to determine the performance champion.
 
-Denco and its predecessor Kocha-urlrouter seem to have great performance, but are not convenient to use as a router for the net/http package. A lot of extra work is necessary to use it as a http.Handler. [The README of Denco claims](https://github.com/naoina/denco/blob/b03dbb499269a597afd0db715d408ebba1329d04/README.md), that the package is not intended as a replacement for [http.ServeMux](http://golang.org/pkg/net/http/#ServeMux).
+Denco seem to have great performance, but are not convenient to use as a router for the net/http package. A lot of extra work is necessary to use it as a http.Handler. [The README of Denco claims](https://github.com/naoina/denco/blob/b03dbb499269a597afd0db715d408ebba1329d04/README.md), that the package is not intended as a replacement for [http.ServeMux](http://golang.org/pkg/net/http/#ServeMux).
 
 [Goji](https://github.com/zenazn/goji/) looks very decent. It has great performance while also having a great range of features, more than any other router / framework in the top group.
 
