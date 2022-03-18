@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/dimfeld/httptreemux"
+	"github.com/dimfeld/httptreemux/v5"
 	"github.com/lvjp/go-http-routing-benchmark/router"
 )
 
