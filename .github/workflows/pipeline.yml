@@ -26,3 +26,4 @@ jobs:
           go-version: 1.17.8
       - run: go build -v ./...
       - run: go test
+      - run: go test -bench
