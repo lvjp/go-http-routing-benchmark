@@ -74,7 +74,13 @@ func TestRouters_parameterMode(t *testing.T) {
 				panic(fmt.Sprint("Unsupported param type: ", builder.ParamType()))
 			}
 
-			r := builder.BuildSingle(method, matcher, router.WriteParameterMode)
+			r := builder.Build(
+				[]router.Route{{
+					Method: method,
+					Path:   matcher,
+				}},
+				router.WriteParameterMode,
+			)
 			w := httptest.NewRecorder()
 			req.Method = method
 			req.RequestURI = path

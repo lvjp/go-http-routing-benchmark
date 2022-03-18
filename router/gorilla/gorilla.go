@@ -40,13 +40,6 @@ func (g *gorillaBuilder) Build(routes []router.Route, mode router.Mode) http.Han
 	return m
 }
 
-func (g *gorillaBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	m := mux.NewRouter()
-	m.HandleFunc(path, h).Methods(method)
-	return m
-}
-
 func getHandler(mode router.Mode) http.HandlerFunc {
 	switch mode {
 	case router.SkipDataMode:

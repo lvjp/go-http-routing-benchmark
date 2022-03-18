@@ -35,13 +35,6 @@ func (g *gowwwBuilder) Build(routes []router.Route, mode router.Mode) http.Handl
 	return router
 }
 
-func (g *gowwwBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	router := gowww.New()
-	router.Handle(method, path, h)
-	return router
-}
-
 func getHandler(mode router.Mode) http.HandlerFunc {
 	switch mode {
 	case router.SkipDataMode:

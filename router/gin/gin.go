@@ -37,15 +37,6 @@ func (g *ginBuilder) Build(routes []router.Route, mode router.Mode) http.Handler
 	return app
 }
 
-func (g *ginBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	app := gin.New()
-
-	app.Handle(method, path, h)
-
-	return app
-}
-
 func getHandler(mode router.Mode) gin.HandlerFunc {
 	switch mode {
 	case router.SkipDataMode:

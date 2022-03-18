@@ -35,13 +35,6 @@ func (hr *httpRouterBuilder) Build(routes []router.Route, mode router.Mode) http
 	return app
 }
 
-func (hr *httpRouterBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	app := httprouter.New()
-	app.Handle(method, path, h)
-	return app
-}
-
 func getHandler(mode router.Mode) httprouter.Handle {
 	switch mode {
 	case router.SkipDataMode:

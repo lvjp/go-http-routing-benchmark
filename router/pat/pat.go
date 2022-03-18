@@ -46,26 +46,6 @@ func (p *patBuilder) Build(routes []router.Route, mode router.Mode) http.Handler
 	return app
 }
 
-func (p *patBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	app := pat.New()
-
-	switch method {
-	case "GET":
-		app.Get(path, h)
-	case "POST":
-		app.Post(path, h)
-	case "PUT":
-		app.Put(path, h)
-	case "DELETE":
-		app.Del(path, h)
-	default:
-		panic("Unknow HTTP method: " + method)
-	}
-
-	return app
-}
-
 func getHandler(mode router.Mode) http.HandlerFunc {
 	switch mode {
 	case router.SkipDataMode:

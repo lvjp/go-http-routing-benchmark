@@ -59,27 +59,6 @@ func (b *beegoBuilder) Build(routes []router.Route, mode router.Mode) http.Handl
 	return app
 }
 
-func (b *beegoBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	app := beego.NewControllerRegister()
-
-	switch method {
-	case "GET":
-		app.Get(path, h)
-	case "POST":
-		app.Post(path, h)
-	case "PUT":
-		app.Put(path, h)
-	case "PATCH":
-		app.Patch(path, h)
-	case "DELETE":
-		app.Delete(path, h)
-	default:
-		panic("Unknow HTTP method: " + method)
-	}
-	return app
-}
-
 func getHandler(mode router.Mode) beego.FilterFunc {
 	switch mode {
 	case router.SkipDataMode:

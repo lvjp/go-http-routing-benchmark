@@ -52,28 +52,6 @@ func (c *chiBuilder) Build(routes []router.Route, mode router.Mode) http.Handler
 	return mux
 }
 
-func (c *chiBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	mux := chi.NewRouter()
-
-	switch method {
-	case "GET":
-		mux.Get(path, h)
-	case "POST":
-		mux.Post(path, h)
-	case "PUT":
-		mux.Put(path, h)
-	case "PATCH":
-		mux.Patch(path, h)
-	case "DELETE":
-		mux.Delete(path, h)
-	default:
-		panic("Unknown HTTP method: " + method)
-	}
-
-	return mux
-}
-
 func getHandler(mode router.Mode) http.HandlerFunc {
 	switch mode {
 	case router.SkipDataMode:

@@ -34,13 +34,6 @@ func (m *macaronBuilder) Build(routes []router.Route, mode router.Mode) http.Han
 	return app
 }
 
-func (m *macaronBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	app := macaron.New()
-	app.Handle(method, path, h)
-	return app
-}
-
 func getHandler(mode router.Mode) []macaron.Handler {
 	switch mode {
 	case router.SkipDataMode:

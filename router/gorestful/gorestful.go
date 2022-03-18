@@ -55,31 +55,6 @@ func (g *goRestfulBuilder) Build(routes []router.Route, mode router.Mode) http.H
 	return wsContainer
 }
 
-func (g *goRestfulBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	wsContainer := restful.NewContainer()
-	ws := new(restful.WebService)
-
-	switch method {
-	case "GET":
-		ws.Route(ws.GET(path).To(h))
-	case "POST":
-		ws.Route(ws.POST(path).To(h))
-	case "PUT":
-		ws.Route(ws.PUT(path).To(h))
-	case "PATCH":
-		ws.Route(ws.PATCH(path).To(h))
-	case "DELETE":
-		ws.Route(ws.DELETE(path).To(h))
-	default:
-		panic("Unknow HTTP method: " + method)
-	}
-
-	wsContainer.Add(ws)
-
-	return wsContainer
-}
-
 func getHandler(mode router.Mode) restful.RouteFunction {
 	switch mode {
 	case router.SkipDataMode:

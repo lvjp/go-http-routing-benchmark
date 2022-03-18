@@ -28,5 +28,4 @@ type Builder interface {
 	Name() string
 	ParamType() ParamType
 	Build(routes []Route, mode Mode) http.Handler
-	BuildSingle(method string, path string, mode Mode) http.Handler
 }

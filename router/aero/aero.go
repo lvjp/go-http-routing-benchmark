@@ -48,27 +48,6 @@ func (a *aeroBuilder) Build(routes []router.Route, mode router.Mode) http.Handle
 	return app
 }
 
-func (a *aeroBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	app := aero.New()
-	switch method {
-	case "GET":
-		app.Get(path, h)
-	case "POST":
-		app.Post(path, h)
-	case "PUT":
-		app.Put(path, h)
-	case "PATCH":
-		app.Router().Add(http.MethodPatch, path, h)
-	case "DELETE":
-		app.Delete(path, h)
-	default:
-		panic("Unknow HTTP method: " + method)
-	}
-
-	return app
-}
-
 func getHandler(mode router.Mode) aero.Handler {
 	switch mode {
 	case router.SkipDataMode:

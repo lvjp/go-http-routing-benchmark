@@ -48,28 +48,6 @@ func (e *echoBuilder) Build(routes []router.Route, mode router.Mode) http.Handle
 	return app
 }
 
-func (e *echoBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	app := echo.New()
-
-	switch method {
-	case "GET":
-		app.GET(path, h)
-	case "POST":
-		app.POST(path, h)
-	case "PUT":
-		app.PUT(path, h)
-	case "PATCH":
-		app.PATCH(path, h)
-	case "DELETE":
-		app.DELETE(path, h)
-	default:
-		panic("Unknow HTTP method: " + method)
-	}
-
-	return app
-}
-
 func getHandler(mode router.Mode) echo.HandlerFunc {
 	switch mode {
 	case router.SkipDataMode:

@@ -83,9 +83,11 @@ func BenchmarkNewMicro(b *testing.B) {
 	for name, builder := range router.GetRegistry() {
 		b.Run(name, func(b *testing.B) {
 			for _, bench := range benchs {
-				r := builder.BuildSingle(
-					"GET",
-					bench.matcher(builder.ParamType()),
+				r := builder.Build(
+					[]router.Route{{
+						Method: "GET",
+						Path:   bench.matcher(builder.ParamType()),
+					}},
 					router.SkipDataMode,
 				)
 
@@ -95,9 +97,11 @@ func BenchmarkNewMicro(b *testing.B) {
 				})
 			}
 
-			r := builder.BuildSingle(
-				"GET",
-				writeBench.matcher(builder.ParamType()),
+			r := builder.Build(
+				[]router.Route{{
+					Method: "GET",
+					Path:   writeBench.matcher(builder.ParamType()),
+				}},
 				router.WriteParameterMode,
 			)
 			req, _ := http.NewRequest("GET", writeBench.url, nil)

@@ -33,13 +33,6 @@ func (g *gorillaBuilder) Build(routes []router.Route, mode router.Mode) http.Han
 	return app
 }
 
-func (g *gorillaBuilder) BuildSingle(method string, path string, mode router.Mode) http.Handler {
-	h := getHandler(mode)
-	app := httptreemux.New()
-	app.Handle(method, path, h)
-	return app
-}
-
 func getHandler(mode router.Mode) httptreemux.HandlerFunc {
 	switch mode {
 	case router.SkipDataMode:
