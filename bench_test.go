@@ -69,9 +69,28 @@ func (mtc *microTestCase) matcher(pt router.ParamType) string {
 // Micro Benchmarks
 func BenchmarkNewMicro(b *testing.B) {
 	benchs := []microTestCase{
-		{"param/1", "GET", "/user/:name", "/user/{name}", "/user/gordon"},
-		{"param/5", "GET", fiveColon, fiveBrace, fiveRoute},
-		{"param/20", "GET", twentyColon, twentyBrace, twentyRoute},
+		{
+			"param/1",
+			"GET",
+			"/user/:name",
+			"/user/{name}",
+			"/user/gordon",
+		},
+		{
+			"param/5",
+			"GET",
+			"/:a/:b/:c/:d/:e",
+			"/{a}/{b}/{c}/{d}/{e}",
+			"/a/b/c/d/e",
+		},
+		{
+			// Aero do not support more than 16 parameters
+			"param/16",
+			"GET",
+			"/:a/:b/:c/:d/:e/:f/:g/:h/:i/:j/:k/:l/:m/:n/:o/:p",
+			"/{a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}/{i}/{j}/{k}/{l}/{m}/{n}/{o}/{p}",
+			"/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p",
+		},
 	}
 
 	writeBench := microTestCase{
@@ -119,22 +138,12 @@ func BenchmarkNewMicro(b *testing.B) {
 // 	benchRequest(b, router, r)
 // }
 
-// Route with 5 Params (no write)
-const fiveColon = "/:a/:b/:c/:d/:e"
-const fiveBrace = "/{a}/{b}/{c}/{d}/{e}"
-const fiveRoute = "/a/b/c/d/e"
-
 // func BenchmarkRevel_Param5(b *testing.B) {
 // 	router := loadRevelSingle("GET", fiveColon, "RevelController.Handle")
 
 // 	r, _ := http.NewRequest("GET", fiveRoute, nil)
 // 	benchRequest(b, router, r)
 // }
-
-// Route with 20 Params (no write)
-const twentyColon = "/:a/:b/:c/:d/:e/:f/:g/:h/:i/:j/:k/:l/:m/:n/:o/:p/:q/:r/:s/:t"
-const twentyBrace = "/{a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}/{i}/{j}/{k}/{l}/{m}/{n}/{o}/{p}/{q}/{r}/{s}/{t}"
-const twentyRoute = "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t"
 
 // func BenchmarkRevel_Param20(b *testing.B) {
 // 	router := loadRevelSingle("GET", twentyColon, "RevelController.Handle")
