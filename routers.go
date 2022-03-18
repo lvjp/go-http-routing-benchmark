@@ -52,7 +52,6 @@ import (
 	// "github.com/revel/revel"
 
 	"github.com/typepress/rivet"
-	"github.com/ursiform/bear"
 	"github.com/vanng822/r2router"
 	goji "github.com/zenazn/goji/web"
 	gojiv2 "goji.io"
@@ -103,47 +102,6 @@ func httpHandlerFunc(_ http.ResponseWriter, _ *http.Request) {}
 
 func httpHandlerFuncTest(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, r.RequestURI)
-}
-
-// bear
-func bearHandler(_ http.ResponseWriter, _ *http.Request, _ *bear.Context) {}
-
-func bearHandlerWrite(w http.ResponseWriter, _ *http.Request, ctx *bear.Context) {
-	io.WriteString(w, ctx.Params["name"])
-}
-
-func bearHandlerTest(w http.ResponseWriter, r *http.Request, _ *bear.Context) {
-	io.WriteString(w, r.RequestURI)
-}
-
-func loadBear(routes []router.Route) http.Handler {
-	h := bearHandler
-	if loadTestHandler {
-		h = bearHandlerTest
-	}
-
-	router := bear.New()
-	re := regexp.MustCompile(":([^/]*)")
-	for _, route := range routes {
-		switch route.Method {
-		case "GET", "POST", "PUT", "PATCH", "DELETE":
-			router.On(route.Method, re.ReplaceAllString(route.Path, "{$1}"), h)
-		default:
-			panic("Unknown HTTP method: " + route.Method)
-		}
-	}
-	return router
-}
-
-func loadBearSingle(method string, path string, handler bear.HandlerFunc) http.Handler {
-	router := bear.New()
-	switch method {
-	case "GET", "POST", "PUT", "PATCH", "DELETE":
-		router.On(method, path, handler)
-	default:
-		panic("Unknown HTTP method: " + method)
-	}
-	return router
 }
 
 // beego
