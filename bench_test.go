@@ -98,12 +98,6 @@ func BenchmarkNewMicro(b *testing.B) {
 	}
 }
 
-func BenchmarkAero_Param(b *testing.B) {
-	router := loadAeroSingle("GET", "/user/:name", aeroHandler)
-
-	r, _ := http.NewRequest("GET", "/user/gordon", nil)
-	benchRequest(b, router, r)
-}
 func BenchmarkBear_Param(b *testing.B) {
 	router := loadBearSingle("GET", "/user/{name}", bearHandler)
 
@@ -295,12 +289,6 @@ const fiveColon = "/:a/:b/:c/:d/:e"
 const fiveBrace = "/{a}/{b}/{c}/{d}/{e}"
 const fiveRoute = "/test/test/test/test/test"
 
-func BenchmarkAero_Param5(b *testing.B) {
-	router := loadAeroSingle("GET", fiveColon, aeroHandler)
-
-	r, _ := http.NewRequest("GET", fiveRoute, nil)
-	benchRequest(b, router, r)
-}
 func BenchmarkBear_Param5(b *testing.B) {
 	router := loadBearSingle("GET", fiveBrace, bearHandler)
 
@@ -492,12 +480,6 @@ const twentyColon = "/:a/:b/:c/:d/:e/:f/:g/:h/:i/:j/:k/:l/:m/:n/:o/:p/:q/:r/:s/:
 const twentyBrace = "/{a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}/{i}/{j}/{k}/{l}/{m}/{n}/{o}/{p}/{q}/{r}/{s}/{t}"
 const twentyRoute = "/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t"
 
-func BenchmarkAero_Param20(b *testing.B) {
-	router := loadAeroSingle("GET", twentyBrace, aeroHandler)
-
-	r, _ := http.NewRequest("GET", twentyRoute, nil)
-	benchRequest(b, router, r)
-}
 func BenchmarkBear_Param20(b *testing.B) {
 	router := loadBearSingle("GET", twentyBrace, bearHandler)
 
@@ -685,12 +667,6 @@ func BenchmarkVulcan_Param20(b *testing.B) {
 }
 
 // Route with Param and write
-func BenchmarkAero_ParamWrite(b *testing.B) {
-	router := loadAeroSingle("GET", "/user/:name", aeroHandlerTest)
-
-	r, _ := http.NewRequest("GET", "/user/gordon", nil)
-	benchRequest(b, router, r)
-}
 func BenchmarkBear_ParamWrite(b *testing.B) {
 	router := loadBearSingle("GET", "/user/{name}", bearHandlerWrite)
 

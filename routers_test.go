@@ -14,7 +14,6 @@ var (
 		name string
 		load func(routes []router.Route) http.Handler
 	}{
-		{"Aero", loadAero},
 		{"Bear", loadBear},
 		{"Beego", loadBeego},
 		{"Bone", loadBone},

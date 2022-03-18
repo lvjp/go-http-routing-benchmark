@@ -287,7 +287,7 @@ func BenchmarkNewGithub(b *testing.B) {
 	}
 
 	for name, builder := range router.GetRegistry() {
-		router := builder.Build(staticRoutes, router.SkipDataMode)
+		router := builder.Build(githubAPI, router.SkipDataMode)
 
 		for _, bench := range benchs {
 			req, _ := http.NewRequest(bench.method, bench.url, nil)
@@ -297,7 +297,7 @@ func BenchmarkNewGithub(b *testing.B) {
 		}
 
 		b.Run(name+"/all", func(b *testing.B) {
-			benchRoutes(b, router, staticRoutes)
+			benchRoutes(b, router, githubAPI)
 		})
 
 	}

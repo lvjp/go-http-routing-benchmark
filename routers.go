@@ -50,7 +50,7 @@ import (
 
 	// "github.com/revel/pathtree"
 	// "github.com/revel/revel"
-	"github.com/aerogo/aero"
+
 	"github.com/typepress/rivet"
 	"github.com/ursiform/bear"
 	"github.com/vanng822/r2router"
@@ -103,63 +103,6 @@ func httpHandlerFunc(_ http.ResponseWriter, _ *http.Request) {}
 
 func httpHandlerFuncTest(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, r.RequestURI)
-}
-
-// Aero
-func aeroHandler(c aero.Context) error {
-	return nil
-}
-
-func aeroHandlerWrite(ctx aero.Context) error {
-	io.WriteString(ctx.Response().Internal(), ctx.Get("name"))
-	return nil
-}
-func aeroHandlerTest(ctx aero.Context) error {
-	io.WriteString(ctx.Response().Internal(), ctx.Request().Path())
-	return nil
-}
-func loadAero(routes []router.Route) http.Handler {
-	var h aero.Handler = aeroHandler
-	if loadTestHandler {
-		h = aeroHandlerTest
-	}
-	app := aero.New()
-	for _, r := range routes {
-		switch r.Method {
-		case "GET":
-			app.Get(r.Path, h)
-		case "POST":
-			app.Post(r.Path, h)
-		case "PUT":
-			app.Put(r.Path, h)
-		case "PATCH":
-			app.Router().Add(http.MethodPatch, r.Path, h)
-		case "DELETE":
-			app.Delete(r.Path, h)
-		default:
-			panic("Unknow HTTP method: " + r.Method)
-		}
-	}
-	return app
-}
-func loadAeroSingle(method, path string, h aero.Handler) http.Handler {
-	app := aero.New()
-	switch method {
-	case "GET":
-		app.Get(path, h)
-	case "POST":
-		app.Post(path, h)
-	case "PUT":
-		app.Put(path, h)
-	case "PATCH":
-		app.Router().Add(http.MethodPatch, path, h)
-	case "DELETE":
-		app.Delete(path, h)
-	default:
-		panic("Unknow HTTP method: " + method)
-	}
-	// }
-	return app
 }
 
 // bear
